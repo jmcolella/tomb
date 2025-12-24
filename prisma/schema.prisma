@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["public", "auth"]
+}
+
+// Supabase auth.users table - read-only reference for typing
+// This table is managed by Supabase, do not create migrations for it
+model User {
+  id                           String    @id @db.Uuid
+  instance_id                  String?   @db.Uuid
+  email                        String?   @db.Text
+  encrypted_password           String?   @db.Text
+  email_confirmed_at           DateTime? @db.Timestamptz(6)
+  invited_at                   DateTime? @db.Timestamptz(6)
+  confirmation_token           String?   @db.Text
+  confirmation_sent_at         DateTime? @db.Timestamptz(6)
+  recovery_token               String?   @db.Text
+  recovery_sent_at             DateTime? @db.Timestamptz(6)
+  email_change_token_new       String?   @db.Text
+  email_change                 String?   @db.Text
+  email_change_sent_at         DateTime? @db.Timestamptz(6)
+  last_sign_in_at              DateTime? @db.Timestamptz(6)
+  raw_app_meta_data            Json?     @db.JsonB
+  raw_user_meta_data           Json?     @db.JsonB
+  is_super_admin               Boolean?
+  created_at                   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                   DateTime  @updatedAt @db.Timestamptz(6)
+  phone                        String?   @db.Text
+  phone_confirmed_at           DateTime? @db.Timestamptz(6)
+  phone_change                 String?   @db.Text
+  phone_change_token           String?   @db.Text
+  phone_change_sent_at         DateTime? @db.Timestamptz(6)
+  confirmed_at                 DateTime? @db.Timestamptz(6)
+  email_change_token_current   String?   @db.Text
+  email_change_confirm_status  Int?      @db.SmallInt
+  banned_until                 DateTime? @db.Timestamptz(6)
+  reauthentication_token       String?   @db.Text
+  reauthentication_sent_at     DateTime? @db.Timestamptz(6)
+  is_sso_user                  Boolean   @default(false)
+  deleted_at                   DateTime? @db.Timestamptz(6)
+  is_anonymous                 Boolean   @default(false)
+  
+  @@schema("auth")
+  @@map("users")
+}
