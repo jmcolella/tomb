@@ -5,6 +5,29 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  ...{
+    "rules": {
+      "react/no-children-prop": [
+        true,
+        {
+          "allowFunctions": true
+        }
+      ]
+    }
+  },
+  ...{
+    "extends": [
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended",
+      "plugin:jsx-a11y/recommended",
+      "prettier",
+    ]
+  },
+  ...{
+    "plugins": [
+      "prettier",
+    ]
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
