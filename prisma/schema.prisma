@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output = "../lib/generated/prisma-client"
 }
 
 datasource db {
@@ -50,4 +51,60 @@ model User {
   
   @@schema("auth")
   @@map("users")
+}
+
+model Library {
+  sid               String    @id @db.VarChar
+  creation_order_id Int       @default(autoincrement())
+  datetime_created  DateTime  @default(now()) @db.Timestamptz(6)
+  datetime_updated  DateTime  @updatedAt @db.Timestamptz(6)
+  user_id           String    @db.Uuid
+  name              String    @db.VarChar
+
+  @@schema("public")
+  @@map("libraries")
+}
+
+model Book {
+  sid               String      @id @db.VarChar
+  creation_order_id Int         @default(autoincrement())
+  datetime_created  DateTime    @default(now()) @db.Timestamptz(6)
+  datetime_updated  DateTime    @updatedAt @db.Timestamptz(6)
+  library_sid       String?      @db.VarChar
+  title             String      @db.VarChar
+  total_pages       Int?
+  status            String      @db.VarChar
+  author_name       String      @db.VarChar
+  user_id           String      @db.Uuid
+
+  @@schema("public")
+  @@map("books")
+}
+
+model BookEvent {
+  sid               String    @id @db.VarChar
+  creation_order_id Int       @default(autoincrement())
+  datetime_created  DateTime  @default(now()) @db.Timestamptz(6)
+  datetime_updated  DateTime  @updatedAt @db.Timestamptz(6)
+  book_sid          String    @db.VarChar
+  event_type        String    @db.VarChar
+  date_effective    DateTime  @db.Date
+  page_number       Int?
+  version           Int
+
+  @@schema("public")
+  @@map("book_events")
+}
+
+model BookEventVersion {
+  sid               String    @id @db.VarChar
+  creation_order_id Int       @default(autoincrement())
+  datetime_created  DateTime  @default(now()) @db.Timestamptz(6)
+  datetime_updated  DateTime  @updatedAt @db.Timestamptz(6)
+  book_sid          String    @db.VarChar
+  version           Int
+  description       String    @db.Text
+
+  @@schema("public")
+  @@map("book_event_versions")
 }
