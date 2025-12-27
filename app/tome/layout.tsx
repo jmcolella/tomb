@@ -3,7 +3,8 @@
 import { theme, Layout, Typography } from "antd";
 import LogoutButton from "@/app/tome/components/LogoutButton";
 import Link from "next/link";
-import useGetUser from "@/app/tome/hooks/auth/useGetUser";
+import useGetUser from "@/app/tome/hooks/user/useGetUser";
+import { ROUTE_HOME } from "@/app/tome/routes";
 
 export default function TombLayout({
   children,
@@ -24,7 +25,7 @@ export default function TombLayout({
           borderBottom: `1px solid ${token.colorBorder}`,
         }}
       >
-        <Link href="/tome/home">
+        <Link href={ROUTE_HOME}>
           <Typography.Title level={2} style={{ margin: 0 }}>
             tome
           </Typography.Title>

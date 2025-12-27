@@ -3,33 +3,13 @@
 import { Input, Button, Typography, Alert } from "antd";
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
-import { useMutation } from "@tanstack/react-query";
+import useLogin from "@/app/tome/hooks/auth/useLogin";
+import { ROUTE_SIGNUP } from "@/app/tome/routes";
 
 const { Title } = Typography;
 
 export default function LoginPage() {
-  const {
-    mutate: signIn,
-    isPending,
-    error: signInError,
-  } = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
-      const response = await fetch("/api/auth/signIn", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      window.location.href = "/tome/home";
-    },
-  });
+  const { mutate: signIn, isPending, error: signInError } = useLogin();
 
   const form = useForm({
     defaultValues: {
@@ -166,7 +146,7 @@ export default function LoginPage() {
         </form>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Link href="/tome/signup">
+          <Link href={ROUTE_SIGNUP}>
             <Button type="link">Don&apos;t have an account? Sign up</Button>
           </Link>
         </div>

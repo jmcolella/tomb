@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { Input, Button, Typography, Alert } from "antd";
 import { useForm } from "@tanstack/react-form";
-import { signUp } from "@/app/server/auth/api";
+import useSignup from "@/app/tome/hooks/auth/useSignup";
 
 const { Title } = Typography;
 
 export default function SignUpPage() {
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate: signUp, isPending: isSubmitting, error } = useSignup();
 
   const form = useForm({
     defaultValues: {
@@ -28,16 +26,10 @@ export default function SignUpPage() {
       },
     },
     onSubmit: async ({ value }) => {
-      setIsSubmitting(true);
-      setError(null);
-
-      const result = await signUp(value.email, value.password);
-
-      if (result.error) {
-        setError(result.error);
-        setIsSubmitting(false);
-      }
-      // If successful, redirect happens in the server action
+      await signUp({
+        email: value.email,
+        password: value.password,
+      });
     },
   });
 
@@ -60,11 +52,10 @@ export default function SignUpPage() {
 
         {error && (
           <Alert
-            message={error}
+            title={error?.message}
             type="error"
             showIcon
             closable
-            onClose={() => setError(null)}
             style={{ marginBottom: 24 }}
           />
         )}
