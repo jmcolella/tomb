@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase-server";
+import { ROUTE_HOME } from "@/app/tome/routes";
 
 export async function proxy(req: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function proxy(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (req.nextUrl.pathname == "/") {
-      return NextResponse.redirect(new URL("/tome/home", req.url));
+      return NextResponse.redirect(new URL(ROUTE_HOME, req.url));
     }
 
     if (!user?.id) {

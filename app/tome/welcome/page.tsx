@@ -1,8 +1,9 @@
 "use client";
 
-import useGetUser from "@/app/tome/hooks/auth/useGetUser";
+import useGetUser from "@/app/tome/hooks/user/useGetUser";
 import { Button, Spin, Typography } from "antd";
 import { redirect, useRouter } from "next/navigation";
+import { ROUTE_HOME, ROUTE_LOGIN } from "@/app/tome/routes";
 
 const { Title, Paragraph } = Typography;
 
@@ -15,7 +16,7 @@ export default function WelcomeScreen() {
   }
 
   if (user) {
-    return redirect("/tome/home");
+    return redirect(ROUTE_HOME);
   }
 
   return (
@@ -37,7 +38,7 @@ export default function WelcomeScreen() {
       <Button
         type="primary"
         size="large"
-        onClick={() => router.push("/tome/login")}
+        onClick={() => router.push(ROUTE_LOGIN)}
       >
         Login
       </Button>

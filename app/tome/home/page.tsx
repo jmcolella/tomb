@@ -3,7 +3,8 @@
 import { Spin, theme, Typography } from "antd";
 import { redirect } from "next/navigation";
 import BooksListClient from "@/app/tome/components/BooksListClient";
-import useGetUser from "@/app/tome/hooks/auth/useGetUser";
+import useGetUser from "@/app/tome/hooks/user/useGetUser";
+import { ROUTE_WELCOME } from "@/app/tome/routes";
 
 export default function HomeClient() {
   const { user, isLoading } = useGetUser();
@@ -25,7 +26,7 @@ export default function HomeClient() {
   }
 
   if (!user) {
-    return redirect("/tome/welcome");
+    return redirect(ROUTE_WELCOME);
   }
 
   return (

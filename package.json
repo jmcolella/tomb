@@ -1,5 +1,5 @@
 {
-  "name": "tomb",
+  "name": "tome",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,12 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "supabase:gen": "npx supabase gen types typescript --project-id oidvdjyxonsarqasdrqu --schema public > app/server/database/types.ts",
-    "env:dev": "cp .env.dev .env",
-    "env:prod": "cp .env.prod .env",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "env-dev": "cp .env.dev .env && npm run db-generate",
+    "env-prod": "cp .env.prod .env && npm run db-generate",
+    "db-generate": "npx supabase init --force && prisma generate",
+    "db-migrate": "prisma migrate dev",
+    "db-migrate:deploy": "prisma migrate deploy",
+    "db-studio": "prisma studio"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.3.0",
