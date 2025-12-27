@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import QueryProvider from "./providers/QueryProvider";
-import ThemeProvider from "./providers/ThemeProvider";
-import { UserProvider } from "./providers/UserProvider";
+import QueryProvider from "@/app/tome/providers/QueryProvider";
+import ThemeProvider from "@/app/tome/providers/ThemeProvider";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -28,9 +27,7 @@ export default function RootLayout({
       >
         <AntdRegistry>
           <ThemeProvider>
-            <QueryProvider>
-              <UserProvider>{children}</UserProvider>
-            </QueryProvider>
+            <QueryProvider>{children}</QueryProvider>
           </ThemeProvider>
         </AntdRegistry>
       </body>

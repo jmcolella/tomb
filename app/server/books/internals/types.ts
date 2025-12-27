@@ -1,4 +1,4 @@
-import { Database } from "../../database/types";
+import { Database } from "@/app/server/database/types";
 
 type BookRow = Database["public"]["Tables"]["books"]["Row"];
 

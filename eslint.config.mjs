@@ -5,28 +5,33 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  ...{
-    "rules": {
+  {
+    rules: {
       "react/no-children-prop": [
-        true,
+        "error",
         {
-          "allowFunctions": true
-        }
-      ]
-    }
+          allowFunctions: true,
+        },
+      ],
+    },
   },
-  ...{
-    "extends": [
-      "plugin:react/recommended",
-      "plugin:react-hooks/recommended",
-      "plugin:jsx-a11y/recommended",
-      "prettier",
-    ]
-  },
-  ...{
-    "plugins": [
-      "prettier",
-    ]
+  // Enforce absolute imports in app directory
+  {
+    files: ["app/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "./*"],
+              message:
+                "Use absolute imports with @/ instead of relative imports (e.g., use @/app/components/Component instead of ../components/Component)",
+            },
+          ],
+        },
+      ],
+    },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([
