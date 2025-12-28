@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "supabase:gen": "npx supabase gen types typescript --project-id oidvdjyxonsarqasdrqu --schema public > app/server/database/types.ts",
+    "supabase-gen": "npx supabase gen types typescript --local > app/server/database/types.ts",
     "env-dev": "cp .env.dev .env && npm run db-generate",
     "env-prod": "cp .env.prod .env && npm run db-generate",
     "db-generate": "npx supabase init --force && prisma generate",

@@ -76,6 +76,7 @@ model Book {
   status            String      @db.VarChar
   author_name       String      @db.VarChar
   user_id           String      @db.Uuid
+  current_page      Int         
 
   @@schema("public")
   @@map("books")
