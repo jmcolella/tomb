@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Modal, Alert } from "antd";
-import BookForm from "@/app/components/BookForm";
+import BookForm from "@/app/tome/components/BookForm";
 
 interface AddBookModalProps {
   open: boolean;

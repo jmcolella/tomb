@@ -7,106 +7,34 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
-      book_events: {
-        Row: {
-          author_name: string | null
-          book_sid: string | null
-          creation_order_id: number
-          datetime_created: string | null
-          datetime_updated: string | null
-          sid: string
-          status: string | null
-          total_pages: number | null
-        }
-        Insert: {
-          author_name?: string | null
-          book_sid?: string | null
-          creation_order_id?: number
-          datetime_created?: string | null
-          datetime_updated?: string | null
-          sid: string
-          status?: string | null
-          total_pages?: number | null
-        }
-        Update: {
-          author_name?: string | null
-          book_sid?: string | null
-          creation_order_id?: number
-          datetime_created?: string | null
-          datetime_updated?: string | null
-          sid?: string
-          status?: string | null
-          total_pages?: number | null
-        }
-        Relationships: []
-      }
-      books: {
-        Row: {
-          author_name: string
-          creation_order_id: number
-          datetime_created: string | null
-          datetime_updated: string | null
-          sid: string
-          status: string | null
-          title: string
-          total_pages: number | null
-        }
-        Insert: {
-          author_name: string
-          creation_order_id?: number
-          datetime_created?: string | null
-          datetime_updated?: string | null
-          sid: string
-          status?: string | null
-          title: string
-          total_pages?: number | null
-        }
-        Update: {
-          author_name?: string
-          creation_order_id?: number
-          datetime_created?: string | null
-          datetime_updated?: string | null
-          sid?: string
-          status?: string | null
-          title?: string
-          total_pages?: number | null
-        }
-        Relationships: []
-      }
-      page_updates: {
-        Row: {
-          book_sid: string | null
-          creation_order_id_id: number
-          datetime_created: string | null
-          datetime_updated: string | null
-          pager_number: number | null
-          sid: string
-        }
-        Insert: {
-          book_sid?: string | null
-          creation_order_id_id?: number
-          datetime_created?: string | null
-          datetime_updated?: string | null
-          pager_number?: number | null
-          sid: string
-        }
-        Update: {
-          book_sid?: string | null
-          creation_order_id_id?: number
-          datetime_created?: string | null
-          datetime_updated?: string | null
-          pager_number?: number | null
-          sid?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
@@ -241,7 +169,11 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
 } as const
+
