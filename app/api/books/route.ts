@@ -1,12 +1,9 @@
 import { headers } from "next/headers";
-import {
-  queryBooks,
-  BookFilters,
-} from "@/app/server/books/internals/bookReader";
+import { queryBooks } from "@/app/server/books/internals/bookReader";
 import { BookApiEntity, AddBookApiInput } from "@/app/api/books/types";
 import { createBook } from "@/app/server/books/internals/bookWriter";
 import convertStringToEnum from "@/app/server/utils/convertStringToEnum";
-import { BookStatus } from "@/app/server/books/types";
+import { BookStatus, BookFilters } from "@/app/server/books/types";
 
 export async function GET(request: Request) {
   const headersList = await headers();

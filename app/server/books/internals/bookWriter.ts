@@ -179,3 +179,93 @@ export async function archiveBook(params: ArchiveBookParams): Promise<{
     };
   }
 }
+
+export interface StartBookParams {
+  bookId: string;
+  userId: string;
+  dateEffective: Date;
+  currentPage: number;
+}
+
+export async function startBook(params: StartBookParams): Promise<{
+  book: Book | null;
+  error: string | null;
+}> {
+  try {
+    // First, verify the book exists and belongs to the user
+    const existingBook = await prisma.book.findFirst({
+      where: {
+        sid: params.bookId,
+        user_id: params.userId,
+      },
+    });
+
+    if (!existingBook) {
+      return {
+        book: null,
+        error: "Book not found or access denied",
+      };
+    }
+
+    // Get the latest book_event_versions version for this book
+    const latestVersion = await prisma.bookEventVersion.findFirst({
+      where: {
+        book_sid: params.bookId,
+      },
+      orderBy: {
+        version: "desc",
+      },
+    });
+
+    if (!latestVersion) {
+      return {
+        book: null,
+        error: "No version found for book",
+      };
+    }
+
+    const dateEffective = new Date(params.dateEffective);
+    dateEffective.setHours(0, 0, 0, 0); // Set to start of day for date_effective
+
+    const bookEventSid = uuidv4();
+
+    // Update book status and create book event in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Update book status to READING and current_page
+      const book = await tx.book.update({
+        where: {
+          sid: params.bookId,
+        },
+        data: {
+          status: BookStatus.READING,
+          current_page: params.currentPage,
+        },
+      });
+
+      // Create book event with STARTED type
+      await tx.bookEvent.create({
+        data: {
+          sid: bookEventSid,
+          book_sid: params.bookId,
+          event_type: BookEventType.STARTED,
+          date_effective: dateEffective,
+          page_number: params.currentPage,
+          version: latestVersion.version,
+        },
+      });
+
+      return book;
+    });
+
+    return {
+      book: new Book(result),
+      error: null,
+    };
+  } catch (error) {
+    console.error("Unexpected error starting book:", error);
+    return {
+      book: null,
+      error: "An unexpected error occurred while starting book",
+    };
+  }
+}

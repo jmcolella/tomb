@@ -1,19 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Table, Typography, Tag, Alert, Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Table, Typography, Tag, Alert, Button, Space } from "antd";
+import { DeleteOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { BookApiEntity } from "@/app/api/books/types";
 import AddBookModal from "@/app/tome/components/AddBookModal";
 import ArchiveBookModal from "@/app/tome/components/ArchiveBookModal";
+import StartBookModal from "@/app/tome/components/StartBookModal";
 import useGetBooks from "@/app/tome/hooks/books/useGetBooks";
 
 const { Title } = Typography;
 
+enum ModalType {
+  ADD = "ADD",
+  ARCHIVE = "ARCHIVE",
+  START = "START",
+}
+
 export default function BooksListClient() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<ModalType | null>(null);
   const [selectedBook, setSelectedBook] = useState<BookApiEntity | null>(null);
   const { books, isLoading, error } = useGetBooks();
 
@@ -45,19 +51,16 @@ export default function BooksListClient() {
     }
   };
 
-  const handleArchiveClick = (book: BookApiEntity) => {
+  const openModal = (book: BookApiEntity | null, modalName: ModalType) => {
     setSelectedBook(book);
-    setIsArchiveModalOpen(true);
+    setActiveModal(modalName);
   };
 
-  const handleArchiveSuccess = () => {
-    setIsArchiveModalOpen(false);
-    setSelectedBook(null);
-  };
-
-  const handleArchiveClose = () => {
-    setIsArchiveModalOpen(false);
-    setSelectedBook(null);
+  const closeModal = (modalName: ModalType) => {
+    if (activeModal === modalName) {
+      setActiveModal(null);
+      setSelectedBook(null);
+    }
   };
 
   const columns: ColumnsType<BookApiEntity> = [
@@ -83,12 +86,21 @@ export default function BooksListClient() {
       title: "Actions",
       key: "actions",
       render: (_: unknown, record: BookApiEntity) => (
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => handleArchiveClick(record)}
-        />
+        <Space>
+          {record.status === "WANT_TO_READ" && (
+            <Button
+              type="text"
+              icon={<PlayCircleOutlined />}
+              onClick={() => openModal(record, ModalType.START)}
+            />
+          )}
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => openModal(record, ModalType.ARCHIVE)}
+          />
+        </Space>
       ),
     },
   ];
@@ -106,7 +118,7 @@ export default function BooksListClient() {
         <Title level={2} style={{ margin: 0 }}>
           Your Books
         </Title>
-        <Button type="primary" onClick={() => setIsModalOpen(true)}>
+        <Button type="primary" onClick={() => openModal(null, ModalType.ADD)}>
           Add Book
         </Button>
       </div>
@@ -117,17 +129,25 @@ export default function BooksListClient() {
         loading={isLoading}
       />
       <AddBookModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => setIsModalOpen(false)}
+        open={activeModal === ModalType.ADD}
+        onClose={() => closeModal(ModalType.ADD)}
+        onSuccess={() => closeModal(ModalType.ADD)}
       />
       {selectedBook && (
-        <ArchiveBookModal
-          open={isArchiveModalOpen}
-          book={selectedBook}
-          onClose={handleArchiveClose}
-          onSuccess={handleArchiveSuccess}
-        />
+        <>
+          <ArchiveBookModal
+            open={activeModal === ModalType.ARCHIVE}
+            book={selectedBook}
+            onClose={() => closeModal(ModalType.ARCHIVE)}
+            onSuccess={() => closeModal(ModalType.ARCHIVE)}
+          />
+          <StartBookModal
+            open={activeModal === ModalType.START}
+            book={selectedBook}
+            onClose={() => closeModal(ModalType.START)}
+            onSuccess={() => closeModal(ModalType.START)}
+          />
+        </>
       )}
     </div>
   );
