@@ -1,32 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Table, Typography, Tag, Alert, Button, Space } from "antd";
-import {
-  DeleteOutlined,
-  PlayCircleOutlined,
-  BookOutlined,
-} from "@ant-design/icons";
+import { Table, Typography, Tag, Alert, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { BookApiEntity } from "@/app/api/books/types";
 import AddBookModal from "@/app/tome/components/AddBookModal";
-import ArchiveBookModal from "@/app/tome/components/ArchiveBookModal";
-import StartBookModal from "@/app/tome/components/StartBookModal";
-import UpdateProgressModal from "@/app/tome/components/UpdateProgressModal";
+import BookActions from "@/app/tome/components/BookActions";
 import useGetBooks from "@/app/tome/hooks/books/useGetBooks";
 
 const { Title } = Typography;
 
 enum ModalType {
   ADD = "ADD",
-  ARCHIVE = "ARCHIVE",
-  START = "START",
-  PROGRESS = "PROGRESS",
 }
 
-export default function BooksListClient() {
+export default function BookList() {
   const [activeModal, setActiveModal] = useState<ModalType | null>(null);
-  const [selectedBook, setSelectedBook] = useState<BookApiEntity | null>(null);
   const { books, isLoading, error } = useGetBooks();
 
   if (isLoading) {
@@ -57,15 +46,13 @@ export default function BooksListClient() {
     }
   };
 
-  const openModal = (book: BookApiEntity | null, modalName: ModalType) => {
-    setSelectedBook(book);
+  const openModal = (modalName: ModalType) => {
     setActiveModal(modalName);
   };
 
   const closeModal = (modalName: ModalType) => {
     if (activeModal === modalName) {
       setActiveModal(null);
-      setSelectedBook(null);
     }
   };
 
@@ -92,28 +79,7 @@ export default function BooksListClient() {
       title: "Actions",
       key: "actions",
       render: (_: unknown, record: BookApiEntity) => (
-        <Space>
-          {record.status === "WANT_TO_READ" && (
-            <Button
-              type="text"
-              icon={<PlayCircleOutlined />}
-              onClick={() => openModal(record, ModalType.START)}
-            />
-          )}
-          {record.status === "READING" && (
-            <Button
-              type="text"
-              icon={<BookOutlined />}
-              onClick={() => openModal(record, ModalType.PROGRESS)}
-            />
-          )}
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => openModal(record, ModalType.ARCHIVE)}
-          />
-        </Space>
+        <BookActions book={record} />
       ),
     },
   ];
@@ -131,7 +97,7 @@ export default function BooksListClient() {
         <Title level={2} style={{ margin: 0 }}>
           Your Books
         </Title>
-        <Button type="primary" onClick={() => openModal(null, ModalType.ADD)}>
+        <Button type="primary" onClick={() => openModal(ModalType.ADD)}>
           Add Book
         </Button>
       </div>
@@ -146,28 +112,6 @@ export default function BooksListClient() {
         onClose={() => closeModal(ModalType.ADD)}
         onSuccess={() => closeModal(ModalType.ADD)}
       />
-      {selectedBook && (
-        <>
-          <ArchiveBookModal
-            open={activeModal === ModalType.ARCHIVE}
-            book={selectedBook}
-            onClose={() => closeModal(ModalType.ARCHIVE)}
-            onSuccess={() => closeModal(ModalType.ARCHIVE)}
-          />
-          <StartBookModal
-            open={activeModal === ModalType.START}
-            book={selectedBook}
-            onClose={() => closeModal(ModalType.START)}
-            onSuccess={() => closeModal(ModalType.START)}
-          />
-          <UpdateProgressModal
-            open={activeModal === ModalType.PROGRESS}
-            book={selectedBook}
-            onClose={() => closeModal(ModalType.PROGRESS)}
-            onSuccess={() => closeModal(ModalType.PROGRESS)}
-          />
-        </>
-      )}
     </div>
   );
 }
