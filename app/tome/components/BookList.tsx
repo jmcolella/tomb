@@ -6,16 +6,19 @@ import type { ColumnsType } from "antd/es/table";
 import { BookApiEntity } from "@/app/api/books/types";
 import AddBookModal from "@/app/tome/components/AddBookModal";
 import BookActions from "@/app/tome/components/BookActions";
+import BookViewModal from "@/app/tome/components/BookViewModal";
 import useGetBooks from "@/app/tome/hooks/books/useGetBooks";
 
 const { Title } = Typography;
 
 enum ModalType {
   ADD = "ADD",
+  BOOK_VIEW = "BOOK_VIEW",
 }
 
 export default function BookList() {
   const [activeModal, setActiveModal] = useState<ModalType | null>(null);
+  const [selectedBook, setSelectedBook] = useState<BookApiEntity | null>(null);
   const { books, isLoading, error } = useGetBooks();
 
   if (isLoading) {
@@ -53,7 +56,15 @@ export default function BookList() {
   const closeModal = (modalName: ModalType) => {
     if (activeModal === modalName) {
       setActiveModal(null);
+      if (modalName === ModalType.BOOK_VIEW) {
+        setSelectedBook(null);
+      }
     }
+  };
+
+  const handleRowClick = (record: BookApiEntity) => {
+    setSelectedBook(record);
+    setActiveModal(ModalType.BOOK_VIEW);
   };
 
   const columns: ColumnsType<BookApiEntity> = [
@@ -106,12 +117,23 @@ export default function BookList() {
         dataSource={books}
         rowKey="sid"
         loading={isLoading}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record),
+          style: { cursor: "pointer" },
+        })}
       />
       <AddBookModal
         open={activeModal === ModalType.ADD}
         onClose={() => closeModal(ModalType.ADD)}
         onSuccess={() => closeModal(ModalType.ADD)}
       />
+      {selectedBook && (
+        <BookViewModal
+          open={activeModal === ModalType.BOOK_VIEW}
+          book={selectedBook}
+          onClose={() => closeModal(ModalType.BOOK_VIEW)}
+        />
+      )}
     </div>
   );
 }

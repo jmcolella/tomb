@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
-import { queryBooks } from "@/app/server/books/internals/bookReader";
+import { getBooks, createBookService } from "@/app/server/books/booksService";
 import { BookApiEntity, AddBookApiInput } from "@/app/api/books/types";
-import { createBook } from "@/app/server/books/internals/bookWriter";
 import convertStringToEnum from "@/app/server/utils/convertStringToEnum";
 import { BookStatus, BookFilters } from "@/app/server/books/types";
 
@@ -38,8 +37,8 @@ export async function GET(request: Request) {
       );
     }
 
-    // queryBooks will use default includeStatuses (all except ARCHIVED) if not provided
-    const books = await queryBooks(filters);
+    // getBooks will use default includeStatuses (all except ARCHIVED) if not provided
+    const books = await getBooks(filters);
 
     // Convert Book instances to BookApiEntity instances
     const bookApiEntities = books.map((book) => new BookApiEntity(book));
@@ -90,7 +89,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { book, error } = await createBook({
+    const { book, error } = await createBookService({
       userId,
       title: body.title,
       authorName: body.author,

@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { updateBookProgress } from "@/app/server/books/internals/bookWriter";
+import { updateBookProgressService } from "@/app/server/books/booksService";
 import { BookApiEntity } from "@/app/api/books/types";
 
 export async function PATCH(
@@ -61,7 +61,7 @@ export async function PATCH(
       );
     }
 
-    const { book, error } = await updateBookProgress({
+    const { book, error } = await updateBookProgressService({
       bookId,
       userId,
       dateEffective: dateEffectiveDate,
