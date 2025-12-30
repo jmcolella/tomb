@@ -2,18 +2,22 @@
 
 import { useState } from "react";
 import { Table, Typography, Tag, Alert, Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { BookApiEntity } from "@/app/api/books/types";
 import AddBookModal from "@/app/tome/components/AddBookModal";
-import ArchiveBookModal from "@/app/tome/components/ArchiveBookModal";
+import BookActions from "@/app/tome/components/BookActions";
+import BookViewModal from "@/app/tome/components/BookViewModal";
 import useGetBooks from "@/app/tome/hooks/books/useGetBooks";
 
 const { Title } = Typography;
 
-export default function BooksListClient() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+enum ModalType {
+  ADD = "ADD",
+  BOOK_VIEW = "BOOK_VIEW",
+}
+
+export default function BookList() {
+  const [activeModal, setActiveModal] = useState<ModalType | null>(null);
   const [selectedBook, setSelectedBook] = useState<BookApiEntity | null>(null);
   const { books, isLoading, error } = useGetBooks();
 
@@ -45,19 +49,22 @@ export default function BooksListClient() {
     }
   };
 
-  const handleArchiveClick = (book: BookApiEntity) => {
-    setSelectedBook(book);
-    setIsArchiveModalOpen(true);
+  const openModal = (modalName: ModalType) => {
+    setActiveModal(modalName);
   };
 
-  const handleArchiveSuccess = () => {
-    setIsArchiveModalOpen(false);
-    setSelectedBook(null);
+  const closeModal = (modalName: ModalType) => {
+    if (activeModal === modalName) {
+      setActiveModal(null);
+      if (modalName === ModalType.BOOK_VIEW) {
+        setSelectedBook(null);
+      }
+    }
   };
 
-  const handleArchiveClose = () => {
-    setIsArchiveModalOpen(false);
-    setSelectedBook(null);
+  const handleRowClick = (record: BookApiEntity) => {
+    setSelectedBook(record);
+    setActiveModal(ModalType.BOOK_VIEW);
   };
 
   const columns: ColumnsType<BookApiEntity> = [
@@ -83,12 +90,7 @@ export default function BooksListClient() {
       title: "Actions",
       key: "actions",
       render: (_: unknown, record: BookApiEntity) => (
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => handleArchiveClick(record)}
-        />
+        <BookActions book={record} />
       ),
     },
   ];
@@ -106,7 +108,7 @@ export default function BooksListClient() {
         <Title level={2} style={{ margin: 0 }}>
           Your Books
         </Title>
-        <Button type="primary" onClick={() => setIsModalOpen(true)}>
+        <Button type="primary" onClick={() => openModal(ModalType.ADD)}>
           Add Book
         </Button>
       </div>
@@ -115,18 +117,21 @@ export default function BooksListClient() {
         dataSource={books}
         rowKey="sid"
         loading={isLoading}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record),
+          style: { cursor: "pointer" },
+        })}
       />
       <AddBookModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => setIsModalOpen(false)}
+        open={activeModal === ModalType.ADD}
+        onClose={() => closeModal(ModalType.ADD)}
+        onSuccess={() => closeModal(ModalType.ADD)}
       />
       {selectedBook && (
-        <ArchiveBookModal
-          open={isArchiveModalOpen}
+        <BookViewModal
+          open={activeModal === ModalType.BOOK_VIEW}
           book={selectedBook}
-          onClose={handleArchiveClose}
-          onSuccess={handleArchiveSuccess}
+          onClose={() => closeModal(ModalType.BOOK_VIEW)}
         />
       )}
     </div>

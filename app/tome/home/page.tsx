@@ -2,7 +2,7 @@
 
 import { Spin, theme, Typography } from "antd";
 import { redirect } from "next/navigation";
-import BooksListClient from "@/app/tome/components/BooksListClient";
+import BookList from "@/app/tome/components/BookList";
 import useGetUser from "@/app/tome/hooks/user/useGetUser";
 import { ROUTE_WELCOME } from "@/app/tome/routes";
 
@@ -37,7 +37,7 @@ export default function HomeClient() {
           Logged in as: {user.email}
         </Typography.Title>
       </div>
-      <BooksListClient />
+      <BookList />
     </div>
   );
 }

@@ -1,10 +1,17 @@
-import { Book, BookStatus } from "@/app/server/books/types";
+import {
+  Book,
+  BookEvent,
+  BookStatus,
+  BookEventType,
+} from "@/app/server/books/types";
 
 export type BookApiStatus = BookStatus;
 
 export interface BookApiFilters {
   include_statuses?: BookApiStatus[];
 }
+
+export type BookEventApiOrderBy = "asc" | "desc";
 
 export interface AddBookApiInput {
   title: string;
@@ -34,5 +41,21 @@ export class BookApiEntity {
     this.currentPage = book.currentPage;
     this.librarySid = book.librarySid;
     this.userId = book.userId;
+  }
+}
+
+export class BookEventApiEntity {
+  public readonly sid: string;
+  public readonly dateEffective: Date;
+  public readonly eventType: BookEventType;
+  public readonly pageNumber: number | null;
+  public readonly version: number;
+
+  constructor(event: BookEvent) {
+    this.sid = event.sid;
+    this.dateEffective = event.dateEffective;
+    this.eventType = event.eventType;
+    this.pageNumber = event.pageNumber;
+    this.version = event.version;
   }
 }

@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { archiveBook } from "@/app/server/books/internals/bookWriter";
+import { archiveBookService } from "@/app/server/books/booksService";
 import { BookApiEntity } from "@/app/api/books/types";
 
 export async function PATCH(
@@ -25,7 +25,7 @@ export async function PATCH(
     );
   }
 
-  const { book, error } = await archiveBook({
+  const { book, error } = await archiveBookService({
     bookId,
     userId,
   });
