@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import { Table, Typography, Tag, Alert, Button, Space } from "antd";
-import { DeleteOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  PlayCircleOutlined,
+  BookOutlined,
+} from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { BookApiEntity } from "@/app/api/books/types";
 import AddBookModal from "@/app/tome/components/AddBookModal";
 import ArchiveBookModal from "@/app/tome/components/ArchiveBookModal";
 import StartBookModal from "@/app/tome/components/StartBookModal";
+import UpdateProgressModal from "@/app/tome/components/UpdateProgressModal";
 import useGetBooks from "@/app/tome/hooks/books/useGetBooks";
 
 const { Title } = Typography;
@@ -16,6 +21,7 @@ enum ModalType {
   ADD = "ADD",
   ARCHIVE = "ARCHIVE",
   START = "START",
+  PROGRESS = "PROGRESS",
 }
 
 export default function BooksListClient() {
@@ -94,6 +100,13 @@ export default function BooksListClient() {
               onClick={() => openModal(record, ModalType.START)}
             />
           )}
+          {record.status === "READING" && (
+            <Button
+              type="text"
+              icon={<BookOutlined />}
+              onClick={() => openModal(record, ModalType.PROGRESS)}
+            />
+          )}
           <Button
             type="text"
             danger
@@ -146,6 +159,12 @@ export default function BooksListClient() {
             book={selectedBook}
             onClose={() => closeModal(ModalType.START)}
             onSuccess={() => closeModal(ModalType.START)}
+          />
+          <UpdateProgressModal
+            open={activeModal === ModalType.PROGRESS}
+            book={selectedBook}
+            onClose={() => closeModal(ModalType.PROGRESS)}
+            onSuccess={() => closeModal(ModalType.PROGRESS)}
           />
         </>
       )}

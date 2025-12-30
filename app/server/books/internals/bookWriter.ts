@@ -3,6 +3,7 @@
 import { v4 as uuidv4 } from "uuid";
 import prisma from "@/lib/prisma";
 import { Book, BookStatus, BookEventType } from "@/app/server/books/types";
+import { getBookById } from "@/app/server/books/internals/bookReader";
 
 export interface CreateBookParams {
   userId: string;
@@ -266,6 +267,96 @@ export async function startBook(params: StartBookParams): Promise<{
     return {
       book: null,
       error: "An unexpected error occurred while starting book",
+    };
+  }
+}
+
+export interface UpdateBookProgressParams {
+  bookId: string;
+  userId: string;
+  dateEffective: Date;
+  currentPage: number;
+}
+
+export async function updateBookProgress(
+  params: UpdateBookProgressParams
+): Promise<{
+  book: Book | null;
+  error: string | null;
+}> {
+  try {
+    // First, verify the book exists and belongs to the user
+    const existingBook = await getBookById(params.bookId);
+
+    // Validate currentPage doesn't exceed totalPages if totalPages exists
+    if (
+      existingBook.totalPages !== null &&
+      params.currentPage > existingBook.totalPages
+    ) {
+      return {
+        book: null,
+        error: `currentPage cannot exceed total pages (${existingBook.totalPages})`,
+      };
+    }
+
+    // Get the latest book_event_versions version for this book
+    const latestVersion = await prisma.bookEventVersion.findFirst({
+      where: {
+        book_sid: params.bookId,
+      },
+      orderBy: {
+        version: "desc",
+      },
+    });
+
+    if (!latestVersion) {
+      return {
+        book: null,
+        error: "No version found for book",
+      };
+    }
+
+    const dateEffective = new Date(params.dateEffective);
+    dateEffective.setHours(0, 0, 0, 0); // Set to start of day for date_effective
+
+    const bookEventSid = uuidv4();
+
+    // Update book current_page and create book event in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Update book current_page (status remains READING)
+      const book = await tx.book.update({
+        where: {
+          sid: params.bookId,
+        },
+        data: {
+          current_page: params.currentPage,
+        },
+      });
+
+      // Create book event with PROGRESS type
+      await tx.bookEvent.create({
+        data: {
+          sid: bookEventSid,
+          book_sid: params.bookId,
+          event_type: BookEventType.PROGRESS,
+          date_effective: dateEffective,
+          page_number: params.currentPage,
+          version: latestVersion.version,
+        },
+      });
+
+      return book;
+    });
+
+    return {
+      book: new Book(result),
+      error: null,
+    };
+  } catch (error) {
+    console.error("Unexpected error updating book progress:", error);
+    return {
+      book: null,
+      error: "An unexpected error occurred while updating book progress",
     };
   }
 }

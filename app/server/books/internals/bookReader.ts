@@ -58,3 +58,13 @@ function applyDefaultFilters(filters: BookFilters): BookFilters {
     ...filters,
   };
 }
+
+export async function getBookById(bookId: string): Promise<Book> {
+  const data = await prisma.book.findFirstOrThrow({
+    where: {
+      sid: bookId,
+    },
+  });
+
+  return new Book(data);
+}
