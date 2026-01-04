@@ -90,7 +90,10 @@ export default function BookList() {
       title: "Actions",
       key: "actions",
       render: (_: unknown, record: BookApiEntity) => (
-        <BookActions book={record} />
+        <BookActions
+          book={record}
+          onViewDetails={() => handleRowClick(record)}
+        />
       ),
     },
   ];
@@ -117,10 +120,6 @@ export default function BookList() {
         dataSource={books}
         rowKey="sid"
         loading={isLoading}
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record),
-          style: { cursor: "pointer" },
-        })}
       />
       <AddBookModal
         open={activeModal === ModalType.ADD}

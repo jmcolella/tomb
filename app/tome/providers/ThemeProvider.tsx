@@ -39,6 +39,11 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
           paddingMD: 16,
           paddingLG: 24,
           paddingXL: 32,
+
+          fontSizeSM: 12,
+          fontSize: 16,
+          fontSizeLG: 18,
+          fontSizeXL: 24,
         },
         components: {
           Button: {

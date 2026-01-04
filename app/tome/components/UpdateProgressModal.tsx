@@ -28,6 +28,7 @@ export default function UpdateProgressModal({
     },
     onSubmit: async ({ value }) => {
       try {
+        console.log("value", value);
         await updateProgress.mutateAsync({
           bookId: book.sid,
           dateEffective: value.dateEffective,
