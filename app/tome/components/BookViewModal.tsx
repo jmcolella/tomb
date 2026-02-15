@@ -185,86 +185,7 @@ export default function BookViewModal({
                 )}
               </Col>
             </Row>
-            <Line
-              data={{
-                labels: metrics.progressEvents.map((event) =>
-                  dayjs(event.dateEffective).format("MMM DD")
-                ),
-                datasets: [
-                  {
-                    label: "Pages Read",
-                    data: metrics.progressEvents.map((event) => event.pageNumber),
-                    borderColor: token.colorPrimary,
-                    backgroundColor: `${token.colorPrimary}20`,
-                    tension: 0.4,
-                    fill: true,
-                  },
-                ],
-              }}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: {
-                    display: true,
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => `Current page: ${context.parsed.y}`,
-                    },
-                  },
-                  // Plugin to draw target pages indicator line
-                  targetLine: {
-                    totalPages: book.totalPages,
-                    color: token.colorSuccess,
-                  },
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    max: book.totalPages || undefined,
-                  },
-                },
-              }}
-              plugins={[
-                {
-                  id: "targetLine",
-                  afterDatasetsDraw(chart) {
-                    const { ctx, chartArea, scales } = chart;
-                    const totalPages = book.totalPages;
 
-                    if (!totalPages || !chartArea) return;
-
-                    const yScale = scales.y;
-                    const yPixel = yScale.getPixelForValue(totalPages);
-
-                    // Draw line
-                    ctx.save();
-                    ctx.strokeStyle = token.colorSuccess;
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([5, 5]);
-                    ctx.beginPath();
-                    ctx.moveTo(chartArea.left, yPixel);
-                    ctx.lineTo(chartArea.right, yPixel);
-                    ctx.stroke();
-                    ctx.restore();
-
-                    // Draw label
-                    ctx.save();
-                    ctx.fillStyle = token.colorSuccess;
-                    ctx.font = `bold 12px ${
-                      window.getComputedStyle(document.body).fontFamily
-                    }`;
-                    ctx.textAlign = "right";
-                    ctx.fillText(
-                      "Total Pages",
-                      chartArea.right - 10,
-                      yPixel - 8
-                    );
-                    ctx.restore();
-                  },
-                },
-              ]}
-            />
           </Card>
           <Card
             style={{ marginBottom: token.marginLG }}
@@ -307,33 +228,119 @@ export default function BookViewModal({
             </Row>
           </Card>
 
-          <Bar
-            data={{
-              labels: metrics.periods.map((period) =>
-                dayjs(period.end).format("MMM DD")
-              ),
-              datasets: [
-                {
-                  label: "Pages Read",
-                  data: metrics.periods.map((period) => period.pageCount),
-                  borderColor: token.colorBorder,
-                  backgroundColor: token.colorPrimary,
-                },
-              ],
-            }}
-            options={{
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: (context) => `Pages read: ${context.parsed.y}`,
+          <Line
+              data={{
+                labels: metrics.progressEvents.map((event) =>
+                  dayjs(event.dateEffective).format("MMM DD")
+                ),
+                datasets: [
+                  {
+                    label: "Pages Read",
+                    data: metrics.progressEvents.map((event) => event.pageNumber),
+                    borderColor: token.colorPrimary,
+                    backgroundColor: `${token.colorPrimary}20`,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: token.colorPrimary,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: true,
+                  },
+                  tooltip: {
+                    enabled: true,
+                    callbacks: {
+                      label: (context) => `Current page: ${context.parsed.y}`,
+                    },
                   },
                 },
-                legend: {
-                  display: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    max: book.totalPages || undefined,
+                  },
                 },
-              },
-            }}
-          />
+              }}
+              plugins={[
+                {
+                  id: "targetLine",
+                  afterDatasetsDraw(chart) {
+                    const { ctx, chartArea, scales } = chart;
+                    const totalPages = book.totalPages;
+
+                    if (!totalPages || !chartArea) return;
+
+                    const yScale = scales.y;
+                    const yPixel = yScale.getPixelForValue(totalPages);
+
+                    // Draw line
+                    ctx.save();
+                    ctx.strokeStyle = token.colorSuccess;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, yPixel);
+                    ctx.lineTo(chartArea.right, yPixel);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Draw label
+                    ctx.save();
+                    ctx.fillStyle = token.colorSuccess;
+                    ctx.font = `bold 12px ${
+                      window.getComputedStyle(document.body).fontFamily
+                    }`;
+                    ctx.textAlign = "right";
+                    ctx.fillText(
+                      "Total Pages",
+                      chartArea.left + 70,
+                      yPixel + 20
+                    );
+                    ctx.restore();
+                  },
+                },
+              ]}
+            />
+
+          <Card
+            style={{ marginTop: token.marginLG, marginBottom: token.marginLG }}
+            size="small"
+            title="Pages Read Per Day"
+          >
+            <Bar
+              data={{
+                labels: metrics.periods.map((period) =>
+                  dayjs(period.end).format("MMM DD")
+                ),
+                datasets: [
+                  {
+                    label: "Pages Read",
+                    data: metrics.periods.map((period) => period.pageCount),
+                    borderColor: token.colorBorder,
+                    backgroundColor: token.colorPrimary,
+                  },
+                ],
+              }}
+              options={{
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => `Pages read: ${context.parsed.y}`,
+                    },
+                  },
+                  legend: {
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </Card>
         </>
       )}
 
