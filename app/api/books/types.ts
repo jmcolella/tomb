@@ -50,6 +50,7 @@ export class BookEventApiEntity {
   public readonly eventType: BookEventType;
   public readonly pageNumber: number | null;
   public readonly version: number;
+  public readonly creationOrderId: number;
 
   constructor(event: BookEvent) {
     this.sid = event.sid;
@@ -57,5 +58,6 @@ export class BookEventApiEntity {
     this.eventType = event.eventType;
     this.pageNumber = event.pageNumber;
     this.version = event.version;
+    this.creationOrderId = event.creationOrderId;
   }
 }

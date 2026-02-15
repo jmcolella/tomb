@@ -87,10 +87,26 @@ export default function BookList() {
         status ? <Tag color={getStatusColor(status)}>{status}</Tag> : "N/A",
     },
     {
+      title: "Progress",
+      key: "progress",
+      render: (_: unknown, record: BookApiEntity) => {
+        if (!record.totalPages || record.currentPage === null) {
+          return "N/A";
+        }
+        const percentage = Math.round(
+          (record.currentPage / record.totalPages) * 100
+        );
+        return `${percentage}%`;
+      },
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_: unknown, record: BookApiEntity) => (
-        <BookActions book={record} />
+        <BookActions
+          book={record}
+          onViewDetails={() => handleRowClick(record)}
+        />
       ),
     },
   ];
@@ -117,10 +133,6 @@ export default function BookList() {
         dataSource={books}
         rowKey="sid"
         loading={isLoading}
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record),
-          style: { cursor: "pointer" },
-        })}
       />
       <AddBookModal
         open={activeModal === ModalType.ADD}

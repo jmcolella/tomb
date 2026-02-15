@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Space } from "antd";
+import { Button, Dropdown, MenuProps } from "antd";
 import {
   DeleteOutlined,
   PlayCircleOutlined,
   BookOutlined,
+  EyeOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
 import { BookApiEntity } from "@/app/api/books/types";
 import ArchiveBookModal from "@/app/tome/components/ArchiveBookModal";
@@ -20,9 +22,10 @@ enum ModalType {
 
 interface BookActionsProps {
   book: BookApiEntity;
+  onViewDetails?: () => void;
 }
 
-export default function BookActions({ book }: BookActionsProps) {
+export default function BookActions({ book, onViewDetails }: BookActionsProps) {
   const [activeModal, setActiveModal] = useState<ModalType | null>(null);
 
   const openModal = (modalName: ModalType) => {
@@ -35,30 +38,52 @@ export default function BookActions({ book }: BookActionsProps) {
     }
   };
 
+  const items: MenuProps["items"] = [
+    {
+      key: "view",
+      label: "View Details",
+      icon: <EyeOutlined />,
+      onClick: onViewDetails,
+    },
+    ...(book.status === "WANT_TO_READ"
+      ? [
+          {
+            key: "start",
+            label: "Start Reading",
+            icon: <PlayCircleOutlined />,
+            onClick: () => openModal(ModalType.START),
+          },
+        ]
+      : []),
+    ...(book.status === "READING"
+      ? [
+          {
+            key: "progress",
+            label: "Update Progress",
+            icon: <BookOutlined />,
+            onClick: () => openModal(ModalType.PROGRESS),
+          },
+        ]
+      : []),
+    {
+      type: "divider",
+    },
+    {
+      key: "archive",
+      label: "Archive",
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: () => openModal(ModalType.ARCHIVE),
+    },
+  ];
+
   return (
     <>
-      <Space>
-        {book.status === "WANT_TO_READ" && (
-          <Button
-            type="text"
-            icon={<PlayCircleOutlined />}
-            onClick={() => openModal(ModalType.START)}
-          />
-        )}
-        {book.status === "READING" && (
-          <Button
-            type="text"
-            icon={<BookOutlined />}
-            onClick={() => openModal(ModalType.PROGRESS)}
-          />
-        )}
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => openModal(ModalType.ARCHIVE)}
-        />
-      </Space>
+      <Dropdown menu={{ items }} trigger={["click"]}>
+        <Button type="text">
+          Manage <DownOutlined />
+        </Button>
+      </Dropdown>
       <ArchiveBookModal
         open={activeModal === ModalType.ARCHIVE}
         book={book}

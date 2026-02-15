@@ -225,9 +225,6 @@ export async function startBook(params: StartBookParams): Promise<{
       };
     }
 
-    const dateEffective = new Date(params.dateEffective);
-    dateEffective.setHours(0, 0, 0, 0); // Set to start of day for date_effective
-
     const bookEventSid = uuidv4();
 
     // Update book status and create book event in a transaction
@@ -249,7 +246,7 @@ export async function startBook(params: StartBookParams): Promise<{
           sid: bookEventSid,
           book_sid: params.bookId,
           event_type: BookEventType.STARTED,
-          date_effective: dateEffective,
+          date_effective: params.dateEffective,
           page_number: params.currentPage,
           version: latestVersion.version,
         },
@@ -316,9 +313,6 @@ export async function updateBookProgress(
       };
     }
 
-    const dateEffective = new Date(params.dateEffective);
-    dateEffective.setHours(0, 0, 0, 0); // Set to start of day for date_effective
-
     const bookEventSid = uuidv4();
 
     // Update book current_page and create book event in a transaction
@@ -339,7 +333,7 @@ export async function updateBookProgress(
           sid: bookEventSid,
           book_sid: params.bookId,
           event_type: BookEventType.PROGRESS,
-          date_effective: dateEffective,
+          date_effective: params.dateEffective,
           page_number: params.currentPage,
           version: latestVersion.version,
         },
