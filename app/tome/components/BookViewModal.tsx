@@ -212,6 +212,11 @@ export default function BookViewModal({
                       label: (context) => `Current page: ${context.parsed.y}`,
                     },
                   },
+                  // Plugin to draw target pages indicator line
+                  targetLine: {
+                    totalPages: book.totalPages,
+                    color: token.colorSuccess,
+                  },
                 },
                 scales: {
                   y: {
@@ -220,6 +225,45 @@ export default function BookViewModal({
                   },
                 },
               }}
+              plugins={[
+                {
+                  id: "targetLine",
+                  afterDatasetsDraw(chart) {
+                    const { ctx, chartArea, scales } = chart;
+                    const totalPages = book.totalPages;
+
+                    if (!totalPages || !chartArea) return;
+
+                    const yScale = scales.y;
+                    const yPixel = yScale.getPixelForValue(totalPages);
+
+                    // Draw line
+                    ctx.save();
+                    ctx.strokeStyle = token.colorSuccess;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, yPixel);
+                    ctx.lineTo(chartArea.right, yPixel);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Draw label
+                    ctx.save();
+                    ctx.fillStyle = token.colorSuccess;
+                    ctx.font = `bold 12px ${
+                      window.getComputedStyle(document.body).fontFamily
+                    }`;
+                    ctx.textAlign = "right";
+                    ctx.fillText(
+                      "Total Pages",
+                      chartArea.right - 10,
+                      yPixel - 8
+                    );
+                    ctx.restore();
+                  },
+                },
+              ]}
             />
           </Card>
           <Card
