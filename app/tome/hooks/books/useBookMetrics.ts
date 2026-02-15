@@ -40,15 +40,11 @@ export function useBookMetrics(
   return useMemo(() => {
     if (!events || events.length === 0) return null;
 
-    // We need events in ascending order for logic, sorted by dateEffective then creationOrderId
-    const sortedEvents = [...events].sort((a, b) => {
-      const dateCompare =
-        dayjs(a.dateEffective).valueOf() - dayjs(b.dateEffective).valueOf();
-      if (dateCompare !== 0) {
-        return dateCompare;
-      }
-      return a.creationOrderId - b.creationOrderId;
-    });
+    // We need events in ascending order for logic
+    const sortedEvents = [...events].sort(
+      (a, b) =>
+        dayjs(a.dateEffective).valueOf() - dayjs(b.dateEffective).valueOf()
+    );
 
     const startEvent =
       sortedEvents.find(
