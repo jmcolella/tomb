@@ -26,16 +26,27 @@ import { BookEventType } from "@/app/server/books/types";
 import useGetBookEvents from "@/app/tome/hooks/books/useGetBookEvents";
 import { useBookMetrics } from "@/app/tome/hooks/books/useBookMetrics";
 import dayjs from "dayjs";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   BarElement,
   BarController,
   LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, BarElement, BarController, LinearScale);
+ChartJS.register(
+  CategoryScale,
+  BarElement,
+  BarController,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement
+);
 
 interface BookViewModalProps {
   open: boolean;
@@ -126,11 +137,25 @@ export default function BookViewModal({
         />
       )}
 
+      <Card style={{ marginBottom: token.marginLG }}>
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Statistic title="Author" value={book.authorName} />
+          </Col>
+          <Col span={12}>
+            <Statistic
+              title="Total Pages"
+              value={book.totalPages || "N/A"}
+            />
+          </Col>
+        </Row>
+      </Card>
+
       {metrics && (
         <>
           <Card title="Progress" style={{ marginBottom: token.marginLG }}>
-            <Row gutter={[16, 16]}>
-              <Col span={12}>
+            <Row gutter={[16, 16]} style={{ marginBottom: token.marginLG }}>
+              <Col span={8}>
                 <Progress
                   type="circle"
                   percent={metrics.percentComplete}
@@ -144,7 +169,10 @@ export default function BookViewModal({
                   format={(percent) => `${percent}%`}
                 />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
+                <Statistic title="Current Page" value={metrics.currentPage} />
+              </Col>
+              <Col span={8}>
                 {metrics.isCompleted ? (
                   <Statistic title="Status" value="Completed" />
                 ) : metrics.estimatedCompletion ? (
@@ -157,6 +185,42 @@ export default function BookViewModal({
                 )}
               </Col>
             </Row>
+            <Line
+              data={{
+                labels: metrics.progressEvents.map((event) =>
+                  dayjs(event.dateEffective).format("MMM DD")
+                ),
+                datasets: [
+                  {
+                    label: "Pages Read",
+                    data: metrics.progressEvents.map((event) => event.pageNumber),
+                    borderColor: token.colorPrimary,
+                    backgroundColor: `${token.colorPrimary}20`,
+                    tension: 0.4,
+                    fill: true,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: true,
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => `Current page: ${context.parsed.y}`,
+                    },
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    max: book.totalPages || undefined,
+                  },
+                },
+              }}
+            />
           </Card>
           <Card
             style={{ marginBottom: token.marginLG }}
@@ -213,7 +277,18 @@ export default function BookViewModal({
                 },
               ],
             }}
-            options={{}}
+            options={{
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    label: (context) => `Pages read: ${context.parsed.y}`,
+                  },
+                },
+                legend: {
+                  display: true,
+                },
+              },
+            }}
           />
         </>
       )}

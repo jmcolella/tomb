@@ -16,6 +16,11 @@ interface PeriodAverage {
   end: Date | null;
 }
 
+interface ProgressEvent {
+  dateEffective: Date;
+  pageNumber: number;
+}
+
 export interface BookMetrics {
   totalDays: number;
   avgPagesPerDay: number;
@@ -24,6 +29,8 @@ export interface BookMetrics {
   estimatedCompletion: dayjs.Dayjs | null;
   isCompleted: boolean;
   percentComplete: number;
+  currentPage: number;
+  progressEvents: ProgressEvent[];
 }
 
 export function useBookMetrics(
@@ -117,6 +124,13 @@ export function useBookMetrics(
       estimatedCompletion = dayjs().add(daysRemaining, "day");
     }
 
+    const progressEvents: ProgressEvent[] = sortedEvents
+      .filter((e) => e.pageNumber !== null)
+      .map((e) => ({
+        dateEffective: e.dateEffective,
+        pageNumber: e.pageNumber as number,
+      }));
+
     return {
       totalDays,
       avgPagesPerDay,
@@ -127,6 +141,8 @@ export function useBookMetrics(
       percentComplete: book.totalPages
         ? (currentPage / book.totalPages) * 100
         : 0,
+      currentPage,
+      progressEvents,
     };
   }, [events, book.totalPages]);
 }
