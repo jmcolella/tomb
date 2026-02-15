@@ -57,6 +57,7 @@ export class BookEvent {
   public readonly dateEffective: BookEventModel["date_effective"];
   public readonly pageNumber: BookEventModel["page_number"];
   public readonly version: BookEventModel["version"];
+  public readonly creationOrderId: BookEventModel["creation_order_id"];
   public readonly datetimeCreated: BookEventModel["datetime_created"];
   public readonly datetimeUpdated: BookEventModel["datetime_updated"];
 
@@ -70,6 +71,7 @@ export class BookEvent {
     this.dateEffective = data.date_effective;
     this.pageNumber = data.page_number;
     this.version = data.version;
+    this.creationOrderId = data.creation_order_id;
     this.datetimeCreated = data.datetime_created;
     this.datetimeUpdated = data.datetime_updated;
   }

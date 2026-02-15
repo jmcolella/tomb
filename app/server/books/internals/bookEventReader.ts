@@ -12,7 +12,7 @@ export async function queryBookEventsAtLatestVersion(
   const latestVersion = await getLatestBookEventVersion(bookId);
 
   // Query book events filtered by book_sid and version, ordered by date_effective (asc/desc),
-  // then creation_order_id descending
+  // then creation_order_id (asc/desc)
   const data = await prisma.bookEvent.findMany({
     where: {
       book_sid: bookId,
@@ -23,7 +23,7 @@ export async function queryBookEventsAtLatestVersion(
         date_effective: dateEffectiveOrder,
       },
       {
-        creation_order_id: "desc",
+        creation_order_id: dateEffectiveOrder,
       },
     ],
   });
