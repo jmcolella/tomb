@@ -26,12 +26,10 @@ import { BookEventType } from "@/app/server/books/types";
 import useGetBookEvents from "@/app/tome/hooks/books/useGetBookEvents";
 import { useBookMetrics } from "@/app/tome/hooks/books/useBookMetrics";
 import dayjs from "dayjs";
-import { Bar, Line } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
-  BarElement,
-  BarController,
   LinearScale,
   LineController,
   LineElement,
@@ -40,8 +38,6 @@ import {
 
 ChartJS.register(
   CategoryScale,
-  BarElement,
-  BarController,
   LinearScale,
   LineController,
   LineElement,
@@ -249,12 +245,15 @@ export default function BookViewModal({
               }}
               options={{
                 responsive: true,
+                interaction: {
+                  mode: "index",
+                  intersect: false,
+                },
                 plugins: {
                   legend: {
                     display: true,
                   },
                   tooltip: {
-                    enabled: true,
                     callbacks: {
                       label: (context) => `Current page: ${context.parsed.y}`,
                     },
@@ -307,40 +306,6 @@ export default function BookViewModal({
                 },
               ]}
             />
-
-          <Card
-            style={{ marginTop: token.marginLG, marginBottom: token.marginLG }}
-            size="small"
-            title="Pages Read Per Day"
-          >
-            <Bar
-              data={{
-                labels: metrics.periods.map((period) =>
-                  dayjs(period.end).format("MMM DD")
-                ),
-                datasets: [
-                  {
-                    label: "Pages Read",
-                    data: metrics.periods.map((period) => period.pageCount),
-                    borderColor: token.colorBorder,
-                    backgroundColor: token.colorPrimary,
-                  },
-                ],
-              }}
-              options={{
-                plugins: {
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => `Pages read: ${context.parsed.y}`,
-                    },
-                  },
-                  legend: {
-                    display: true,
-                  },
-                },
-              }}
-            />
-          </Card>
         </>
       )}
 
