@@ -76,6 +76,14 @@ export function useBookMetrics(
 
     const avgPagesPerDay = currentPage / totalDays;
 
+    // Consolidate events by date (keep only the last event per day)
+    const consolidatedByDate = new Map<string, typeof sortedEvents[0]>();
+    for (const event of sortedEvents) {
+      const dateKey = dayjs(event.dateEffective).format("YYYY-MM-DD");
+      consolidatedByDate.set(dateKey, event);
+    }
+    const consolidatedEvents = Array.from(consolidatedByDate.values());
+
     // Best Period calculation
     let bestPeriod: PeriodAverage = {
       avg: 0,
@@ -85,9 +93,9 @@ export function useBookMetrics(
 
     const periods: Period[] = [];
 
-    for (let i = 1; i < sortedEvents.length; i++) {
-      const prev = sortedEvents[i - 1];
-      const curr = sortedEvents[i];
+    for (let i = 1; i < consolidatedEvents.length; i++) {
+      const prev = consolidatedEvents[i - 1];
+      const curr = consolidatedEvents[i];
 
       if (prev.pageNumber === null || curr.pageNumber === null) continue;
 
