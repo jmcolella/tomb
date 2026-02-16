@@ -10,10 +10,12 @@ import {
   archiveBook,
   startBook,
   updateBookProgress,
+  updateBookProgressBackdated,
   CreateBookParams,
   ArchiveBookParams,
   StartBookParams,
   UpdateBookProgressParams,
+  UpdateBookProgressBackdatedParams,
 } from "@/app/server/books/internals/bookWriter";
 import { queryBookEventsAtLatestVersion } from "@/app/server/books/internals/bookEventReader";
 
@@ -60,4 +62,13 @@ export async function getBookEvents(
   dateEffectiveOrder: "asc" | "desc" = "desc"
 ): Promise<BookEvent[]> {
   return queryBookEventsAtLatestVersion(bookId, dateEffectiveOrder);
+}
+
+export async function updateBookProgressBackdatedService(
+  params: UpdateBookProgressBackdatedParams
+): Promise<{
+  book: Book | null;
+  error: string | null;
+}> {
+  return updateBookProgressBackdated(params);
 }
